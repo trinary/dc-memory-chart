@@ -1,0 +1,45 @@
+
+.xaxis {
+  stroke-width: 1px;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.x.axis line {
+  stroke: #444;
+  stroke-width:1px;
+  fill: none;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.y.axis line, .y.axis path {
+  fill: none;
+  stroke: #000;
+}
+
+.point {
+  fill: #999;
+  stroke: none;
+  fill-opacity: 0.1;
+}
+
+.domain {
+  stroke: #444;
+  stroke-width:1px;
+  fill: none;
+}
+
+body {
+  font: 10px sans-serif;
+  margin: 0;
+}
+
+.detail {
+  font: 36px sans-serif;
+  margin: 40px;
+}
