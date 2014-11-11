@@ -48,7 +48,6 @@ function drawField(data, acc) {
     .range([0,width - margin - margin]);
 
   var y = d3.scale.linear().domain([0, d3.max(data, acc)]).range([height-margin,margin]);
-  console.log(y.domain());
 
   var xAxis = d3.svg.axis()
     .scale(x)
@@ -73,7 +72,6 @@ function drawField(data, acc) {
     .style("stroke", function(d,i) { return color(i); })
     .style("fill", "none")
       .attr("d", line);
-  console.log(nest.map(function(d) { return d.values; }));
   var points = d3.select("svg").selectAll(".pointc")
     .data(nest.map(function(d) { return d.values; }))
     .enter()
@@ -88,7 +86,7 @@ function drawField(data, acc) {
     .on("mouseout", mouseOut)
     .classed("point", true)
     .attr({
-      cx: function(d) { console.log(d); return x(new Date(d.time)); },
+      cx: function(d) { return x(new Date(d.time)); },
       cy: function(d) { return y(acc(d)); },
       r: 5
     });
