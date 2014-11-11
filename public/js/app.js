@@ -3,6 +3,11 @@ d3.select("body")
   .append("div")
   .style("margin", "20px")
   .append("select")
+  .attr("id", "files");
+d3.select("body")
+  .append("div")
+  .style("margin", "20px")
+  .append("select")
   .attr("id", "picker");
 var svg = d3.select("body").append("svg")
   .attr({
@@ -94,36 +99,51 @@ function drawField(data, acc) {
   d3.select(".y.axis").transition().call(yAxis);
 }
 
-d3.json("data/data3.json", function(data) {
-  function populatePicker(data) {
-    var entries = d3.entries(data[0]);
-    var groups = d3.select("#picker")
-      .on("change", pickerChange)
-      .selectAll("optgroup")
-      .data(entries)
-      .enter()
-      .append("optgroup")
-      .attr("label", function(d) {return d.key;});
+function getSetAndDraw(path) {
+  d3.json(path, function(data) {
+    function populatePicker(data) {
+      var entries = d3.entries(data[0]);
+      var groups = d3.select("#picker")
+        .on("change", pickerChange)
+        .selectAll("optgroup")
+        .data(entries)
+        .enter()
+        .append("optgroup")
+        .attr("label", function(d) {return d.key;});
 
-    groups.selectAll("option")
-      .data(function(d) { 
-        if (typeof(d.value) == "object") { 
-          return d3.entries(d.value);
-        } else {
-          return [];
-        }
-      })
-      .enter()
-      .append("option")
-      .text(function(d) { return d.key; });
+      groups.selectAll("option")
+        .data(function(d) { 
+          if (typeof(d.value) == "object") { 
+            return d3.entries(d.value);
+          } else {
+            return [];
+          }
+        })
+        .enter()
+        .append("option")
+        .text(function(d) { return d.key; });
+    }
+
+    function pickerChange(event) { 
+      var elem = d3.select(this.selectedOptions[0]);
+      var parent = d3.select(elem.node().parentNode);
+      drawField(data,accessor(parent.attr("label"), elem.text()));
+    }
+    populatePicker(data);
+  });
+}
+
+d3.json("/files", function(files) {
+  function fileChange(ev) {
+    console.log(ev, d3.select(this.selectedOptions[0]).text());
+    var file = d3.select(this.selectedOptions[0]).text();
+    getSetAndDraw("/data/" + file);
   }
-
-  function pickerChange(event) { 
-    var elem = d3.select(this.selectedOptions[0]);
-    var parent = d3.select(elem.node().parentNode);
-    drawField(data,accessor(parent.attr("label"), elem.text()));
-  }
-  populatePicker(data);
-
+  var filePicker = d3.select("#files")
+    .on("change", fileChange)
+    .selectAll("option")
+    .data(files)
+    .enter()
+    .append("option")
+    .text(function(d) { return d;})
 });
-
