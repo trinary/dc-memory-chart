@@ -1,4 +1,4 @@
-var width = 900, height = 600;
+var width = 900, height = 600, margin = 40;
 d3.select("body")
   .append("div")
   .style("margin", "20px")
@@ -10,6 +10,9 @@ var svg = d3.select("body").append("svg")
     height: height
     });
 
+d3.select("body").append("div").classed("detail", true);
+svg.append("g").attr("class", "x axis").attr("transform", "translate(" + [margin,(height - margin)] + ")");
+svg.append("g").attr("class", "y axis").attr("transform", "translate(" + [(width - margin), 0] + ")");
 
 function accessor() {
   var args = arguments;
@@ -23,7 +26,17 @@ function accessor() {
   return f;
 }
 
+
 function drawField(data, acc) {
+
+  function mouseOver(ev) {
+    d3.select(".detail").text("Value: " + acc(ev) + " Time: " + new Date(ev.time));
+  }
+
+  function mouseOut(ev) {
+    d3.select(".detail").text("");
+  }
+
   var nest = d3.nest()
     .key(function(d) { return d.name;})
     .entries(data);
@@ -32,27 +45,58 @@ function drawField(data, acc) {
 
   var x = d3.time.scale()
     .domain(d3.extent(data, function(d) { return new Date(d.time);}))
-    .range([0,960]);
-  var y = d3.scale.linear().domain([0, d3.max(data, acc)]).range([600,0]);
+    .range([0,width - margin - margin]);
+
+  var y = d3.scale.linear().domain([0, d3.max(data, acc)]).range([height-margin,margin]);
   console.log(y.domain());
+
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("right")
+    .tickFormat(d3.format(".3s"));
 
   var line = d3.svg.line()
     .x(function(d) { return x(new Date(d.time)); })
-    .y(function(d) { return y(acc(d)); });
+    .y(function(d) { return y(d3.format("0.3f")(acc(d))); });
 
   d3.select("svg").selectAll("path").remove();
+  d3.select("svg").selectAll(".pointc").remove();
   var lines = d3.select("svg").selectAll("path")
-    .data(nest.map(function(d) { return d.values} ))
+    .data(nest.map(function(d) { return d.values; } ))
     .enter()
     .append("path")
-    .style("stroke", function(d,i) { return color(i)})
+    .attr("transform", "translate(" + [margin, 0] + ")")
+    .style("stroke", function(d,i) { return color(i); })
     .style("fill", "none")
       .attr("d", line);
+  console.log(nest.map(function(d) { return d.values; }));
+  var points = d3.select("svg").selectAll(".pointc")
+    .data(nest.map(function(d) { return d.values; }))
+    .enter()
+    .append("g")
+    .attr("transform", "translate(" + [margin, 0] + ")")
+    .classed("pointc", true)
+    .selectAll(".point")
+    .data(function(d) { return d;})
+    .enter()
+    .append("circle")
+    .on("mouseover", mouseOver)
+    .on("mouseout", mouseOut)
+    .classed("point", true)
+    .attr({
+      cx: function(d) { console.log(d); return x(new Date(d.time)); },
+      cy: function(d) { return y(acc(d)); },
+      r: 5
+    });
+  d3.select(".x.axis").transition().call(xAxis);
+  d3.select(".y.axis").transition().call(yAxis);
 }
 
-
-
-d3.json("data/data2.json", function(data) {
+d3.json("data/data3.json", function(data) {
   function populatePicker(data) {
     var entries = d3.entries(data[0]);
     var groups = d3.select("#picker")
@@ -82,5 +126,6 @@ d3.json("data/data2.json", function(data) {
     drawField(data,accessor(parent.attr("label"), elem.text()));
   }
   populatePicker(data);
+
 });
 
