@@ -15,7 +15,9 @@ var svg = d3.select("body").append("svg")
     height: height
     });
 
-d3.select("body").append("div").classed("detail", true);
+d3.select("body").append("div").append("h1").attr("id", "value");
+d3.select("body").append("div").append("h1").attr("id", "time");
+d3.select("body").append("div").append("h1").attr("id", "name");
 svg.append("g").attr("class", "x axis").attr("transform", "translate(" + [margin,(height - margin)] + ")");
 svg.append("g").attr("class", "y axis").attr("transform", "translate(" + [(width - margin), 0] + ")");
 
@@ -34,16 +36,19 @@ function accessor() {
 
 function drawField(data, acc) {
 
-  function mouseOver(ev) {
-    d3.select(".detail").text("Value: " + acc(ev) + " Time: " + new Date(ev.time));
+  function mouseOver(d) {
+    d3.select("#value").text("Value: " + acc(d));
+    d3.select("#time").text("Time: " + new Date(d.time));
+    d3.select("#name").text("Service: " + d.name + " PID: " + d.pid);
+    console.log(d, this);
   }
 
-  function mouseOut(ev) {
+  function mouseOut(d) {
     d3.select(".detail").text("");
   }
 
   var nest = d3.nest()
-    .key(function(d) { return d.name;})
+    .key(function(d) { return d.name + d.pid;})
     .entries(data);
 
   var color = d3.scale.category10();
@@ -69,12 +74,13 @@ function drawField(data, acc) {
 
   d3.select("svg").selectAll("path").remove();
   d3.select("svg").selectAll(".pointc").remove();
+  console.log(nest.map(function(d) { return d.values }));
   var lines = d3.select("svg").selectAll("path")
     .data(nest.map(function(d) { return d.values; } ))
     .enter()
     .append("path")
     .attr("transform", "translate(" + [margin, 0] + ")")
-    .style("stroke", function(d,i) { return color(i); })
+    .style("stroke", function(d,i) { return color(d[0].name); })
     .style("fill", "none")
       .attr("d", line);
   var points = d3.select("svg").selectAll(".pointc")
@@ -137,6 +143,7 @@ d3.json("/files", function(files) {
   function fileChange(ev) {
     console.log(ev, d3.select(this.selectedOptions[0]).text());
     var file = d3.select(this.selectedOptions[0]).text();
+
     getSetAndDraw("/data/" + file);
   }
   var filePicker = d3.select("#files")

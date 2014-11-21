@@ -8,6 +8,6 @@ get '/' do
 end
 
 get '/files' do
-  files = Dir.entries(settings.root + '/public/data').select {|f| f =~ /\.json$/}
+  files = ["Please choose a file"].concat Dir.entries(settings.root + '/public/data').select {|f| f =~ /\.json$/}
   [200, {'Content-Type' =>  'application/json'}, files.to_json]
 end
