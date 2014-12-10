@@ -74,11 +74,12 @@ function drawField(data, acc) {
 
   d3.select("svg").selectAll("path").remove();
   d3.select("svg").selectAll(".pointc").remove();
-  console.log(nest.map(function(d) { return d.values }));
+
   var lines = d3.select("svg").selectAll("path")
     .data(nest.map(function(d) { return d.values; } ))
     .enter()
     .append("path")
+    .attr("class", function(d,i) { return "set-" + i;})
     .attr("transform", "translate(" + [margin, 0] + ")")
     .style("stroke", function(d,i) { return color(d[0].name); })
     .style("fill", "none")
