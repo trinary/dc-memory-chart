@@ -25,7 +25,7 @@
 .point {
   fill: #999;
   stroke: none;
-  fill-opacity: 0.1;
+  fill-opacity: 0;
 }
 
 .domain {
@@ -39,7 +39,7 @@ body {
   margin: 0;
 }
 
-.detail {
-  font: 36px sans-serif;
-  margin: 40px;
+h1 {
+  font: 24px sans-serif;
+  margin: 20px;
 }
