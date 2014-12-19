@@ -70,7 +70,7 @@ function drawField(data, acc) {
 
   var line = d3.svg.line()
     .x(function(d) { return x(new Date(d.time)); })
-    .y(function(d) { return y(d3.format("0.3f")(acc(d))); });
+    .y(function(d) { return y(acc(d)); });
 
   d3.select("svg").selectAll("path").remove();
   d3.select("svg").selectAll(".pointc").remove();
